@@ -300,7 +300,8 @@ class LogisticRegression():
 - For linear or logistic regression
 - Select $\lambda$ using cross-validation
 - Cost function: $J(\theta)=\dots\frac{1}{m}\left((\text{measure of fit})+\lambda\displaystyle\sum_{j=1}^{n}\theta_{j}^{2}\right)$ except for $\theta_{0}$
-- Closed form solution for linear regression: $\theta=\left(X^{T}X+\lambda
+- Closed form solution for linear regression: 
+$$\theta=\left(X^{T}X+\lambda
 \begin{bmatrix}
 0\\
 & 1\\
@@ -308,5 +309,5 @@ class LogisticRegression():
 & & & \ddots\\
 & & & & 1\\
 \end{bmatrix}
-\right)^{-1}X^{T}\bar{y}$
+\right)^{-1}X^{T}\bar{y}$$
 - Gradient descent: $\theta_{j}=\theta_{j}-\alpha(\frac{1}{m}\left((\text{derivative of measure of fit})+\lambda\theta_{j}\right))$ except for $\theta_{0}$
