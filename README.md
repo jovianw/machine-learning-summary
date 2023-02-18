@@ -2,7 +2,7 @@
 
 This is a cheatsheet for me to understanding machine-learning techniques and methods, and it might help someone else out there too.
 
-Topics:
+## Contents
 - [Introduction](#machine-learning-summary)
     - [Variable Definitions](#variable-definitions)
 - [Models](#models)
@@ -15,7 +15,7 @@ Topics:
     - [Cross Validation](#cross-validation)
     - [Regularization](#regularization)
 
-### Variable Definitions
+## Variable Definitions
 
 - $x$: input feature
 - $X$: design matrix (first column is 1's)
@@ -38,8 +38,6 @@ import random
 import sklearn.datasets 
 import time
 ```
-
----
 
 # Models
 
@@ -289,8 +287,6 @@ class LogisticRegression():
 ## Support Vector Machines
 
 - 
-
----
 
 # Techniques
 
