@@ -303,11 +303,12 @@ class LogisticRegression():
 - Closed form solution for linear regression: 
 $$\theta=\left(X^{T}X+\lambda
 \begin{bmatrix}
-0\\
-& 1\\
-& & 1\\
-& & & \ddots\\
+0 & & & &\\
+& 1 & & &\\
+& & 1 & &\\
+& & & \ddots &\\
 & & & & 1\\
 \end{bmatrix}
-\right)^{-1}X^{T}\bar{y}$$
+\right)^{-1}X^{T}\bar{y}
+$$
 - Gradient descent: $\theta_{j}=\theta_{j}-\alpha(\frac{1}{m}\left((\text{derivative of measure of fit})+\lambda\theta_{j}\right))$ except for $\theta_{0}$
