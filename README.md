@@ -29,6 +29,8 @@ This is a cheatsheet for me to understanding machine-learning techniques and met
 - $w$: weight
 - $W$: weight matrix
 - $\lambda$: regularization parameter
+- $\Phi$: bernoulli distribution probability
+- $\Sigma$: Sum or covariance matrix
 
 ```python
 import matplotlib.pyplot as plt
@@ -281,12 +283,102 @@ class LogisticRegression():
 
 - Try to estimate $p(x|y)$ and $p(y)$ for each label $y$
 - Generative algorithm, classification
+- $p(y=\text{label}|\vec{x})=\frac{p(\vec{x}|y=\text{label}) p(y=\text{label})}{p(\vec{x})}$
+- $p(\vec{x}|y=\text{label})=N(\vec{\mu_\text{label}}, \Sigma)=\frac{1}{(2\pi)^{n/2}|\Sigma|^{1/2}}\exp\left(-\frac{1}{2}(\vec{x}-\mu_\text{label})^T\Sigma^{-1}(\vec{x}-\mu_\text{label})\right)$
+- $p(y=\text{label})=\phi_\text{label}$
+- Maximum likelihood parameter estimations:  
+    - $\Phi=\frac{\text{number of entries where y=label}}{\text{total number of entries}}$
+    - $\mu_{\text{label}}^*=\text{average }\vec{x}\text{ when y=label}$
+    - $\Sigma^*=\frac{1}{m}\displaystyle\sum_{i=1}^{m}(\vec{x}-\mu_{y^{(i)}})(\vec{x}-\mu_{y^{(i)}})^T$
+- Decision boundary is linear if distribution $\sigma$ is shared, otherwise boundaries are quadratic
+- Makes stronger assumptions on data; if assumptions are valid, will find better fit with less training.
+
+```python
+class GDA():
+    def __init__(self, X, y):
+        self.X = X
+        self.y = y
+        self.mu0 = np.zeros((self.X.shape[1], 1))
+        self.mu1 = np.zeros((self.X.shape[1], 1))
+        self.sigma = np.zeros((X.shape[1], X.shape[1]))
+        self.phi = 0
+        
+    def fit(self):
+        m = len(self.y)
+        m1 = self.y.sum()
+        m0 = m - m1
+        # Phi
+        self.phi = m1 / m
+        # M0
+        self.mu0 = np.zeros((self.X.shape[1], 1))
+        for i in range(len(self.y)):
+            if self.y[i] == 0: self.mu0 += self.X[i:i+1,:].T
+        self.mu0 /= m0
+        # M1
+        self.mu1 = np.zeros((self.X.shape[1], 1))
+        for i in range(len(self.y)):
+            if self.y[i] == 1: self.mu1 += self.X[i:i+1,:].T
+        self.mu1 /= m1
+        # Sigma
+        self.sigma = np.zeros((self.X.shape[1], self.X.shape[1]))
+        for i in range(len(self.y)):
+            if self.y[i] == 0:
+                self.sigma += np.dot((self.X[i:i+1,:].T - self.mu0), (self.X[i:i+1,:] - self.mu0.T))
+            else:
+                self.sigma += np.dot((self.X[i:i+1,:].T - self.mu1), (self.X[i:i+1,:] - self.mu1.T))
+        self.sigma /= m
+        return (self.phi, self.mu0, self.mu1, self.sigma)
+    
+    def plot(self):
+        # Scatterplot
+        plt.scatter(self.X[:,0], self.X[:,1], c=self.y, cmap='coolwarm')
+        # Contour maps
+        x, y = np.mgrid[self.X[:,0].min():self.X[:,0].max():0.1, self.X[:,1].min():self.X[:,1].max():0.1]
+        pos = np.empty(x.shape + (2,))
+        pos[:, :, 0] = x; pos[:, :, 1] = y
+        rv0 = sp.stats.multivariate_normal(self.mu0.ravel(), self.sigma)
+        rv1 = sp.stats.multivariate_normal(self.mu1.ravel(), self.sigma)
+        plt.contour(x, y, rv0.pdf(pos), levels=5, colors='blue', alpha=0.5)
+        plt.contour(x, y, rv1.pdf(pos), levels=5, colors='red', alpha=0.5)
+        plt.xlabel('Citric Acid')
+        plt.ylabel('Total Sulfur Dioxide')
+        plt.title('Gaussian Distributions')
+        plt.show()
+        
+    def predict(self, testX):
+        # flatten the training data
+        testX = testX.reshape(testX.shape[0], -1)
+        scores = np.zeros((testX.shape[0], 2))
+        # probability of 0
+        distribution0 = sp.stats.multivariate_normal(mean=self.mu0.ravel(), cov=self.sigma)
+        for i in range(testX.shape[0]):
+            scores[i, 0] = np.log(1 - self.phi) + distribution0.logpdf(testX[i,:])
+        # probability of 1
+        distribution1 = sp.stats.multivariate_normal(mean=self.mu1.ravel(), cov=self.sigma)
+        for i in range(testX.shape[0]):
+            scores[i, 1] = np.log(self.phi) + distribution1.logpdf(testX[i,:])
+        predictions = np.argmax(scores, axis=1)
+        return predictions
+
+    def accuracy(self, test):
+        testX = test[:, :-1]
+        testY = test[:, -1:]
+        return np.sum(self.predict(testX) == testY.ravel()) / test.shape[0]
+```
 
 ---
 
 ## Support Vector Machines
 
-- 
+- Binary Classification
+- $y\in\{-1,1\}$
+- Intuition: create a line that has the largest gap between the closest points of each class. The closest points are support vectors.
+- $\displaystyle{\min_{w,b}\frac{1}{2}||w||^2}$, subject to $y^{(i)}(w^Tx^{(i)}+b)\ge1$, for $i=1\dots m$
+- The process of solving this can be entirely written using inner products. Inner products can be replaced with some feature mapping $\Phi(.)$ to learn high dimensional feature spaces.
+    - Polynomial kernels
+    - Radial basis function kernel
+- Soft-margin SVM optimization:  
+$\displaystyle{\min_{\Phi,w,b}\frac{1}{2}||w||^2+C\displaystyle\sum_{i=1}^{m}\xi_i}$ such that $y^{(i)}(w^Tx^{(i)}+b)\ge 1-\xi_i$, for $i=1\dots m$ and $\xi\ge0$ (the slack variable)
 
 # Techniques
 
@@ -308,7 +400,7 @@ class LogisticRegression():
 & 1 & & &\\
 & & 1 & &\\
 & & & \ddots &\\
-& & & & 1\\
+& & & & 1
 \end{bmatrix}
 \right)^{-1}X^{T}\bar{y}
 ```
