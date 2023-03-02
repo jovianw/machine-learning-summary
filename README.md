@@ -11,6 +11,7 @@ This is a cheatsheet for me to understanding machine-learning techniques and met
     - [Logistic Regression](#logistic-regression)
     - [Gaussian Discriminant Analysis](#gaussian-discriminant-analysis)
     - [Support Vector Machines (SVMs)](#support-vector-machines)
+    - [Naive Bayes](#naive-bayes)
 - [Techniques](#techniques)
     - [Cross Validation](#cross-validation)
     - [Regularization](#regularization)
@@ -379,6 +380,25 @@ class GDA():
     - Radial basis function kernel
 - Soft-margin SVM optimization:  
 $\displaystyle{\min_{\Phi,w,b}\frac{1}{2}||w||^2+C\displaystyle\sum_{i=1}^{m}\xi_i}$ such that $y^{(i)}(w^Tx^{(i)}+b)\ge 1-\xi_i$, for $i=1\dots m$ and $\xi\ge0$ (the slack variable)
+
+---
+
+## Naive Bayes
+
+- Assumption: Given a training set $\{x^{(i)},y^{(i)}\}$, $x_i$ values are conditionally independent given y. ($x_i$ is binary variable)
+- Using the chain rule of probability, $p(x_1,x_2,\dots,x_n|y)=p(x_1|y)p(x_2|y,x_1)\dots p(x_n|y,x_1,x_2,\dots,x_{n-1})$
+- Combination: $p(x_1,x_2,\dots,x_n|y) = \displaystyle \prod_{j=1}^{n}p(x_j|y)$
+- Parameters:   
+$\Phi_{j|y=\text{label}}=p(x_j=1|y=\text{label})$  
+$\Phi_y=p(y^{(i)})$
+- Maximum Likelihood Estimations:  
+$\Phi_{j|y=\text{label}}=$ fraction of entries with $y=\text{label}$ where $x_j=1$  
+$\Phi_y=$ fraction of entries where $y=1$
+- Output: $p(y=1|x)=\frac{p(x|y=1)p(y=1)}{p(x)}$  
+- If training set is missing data and both $p(x|y=0)=0, p(x|y=1)=0$, apply Laplance smoothing  
+$\Phi_{j|y=\text{label}}=\frac{(\text{number of entries where }x_j=1\text{ and }y=\text{label})+1}{(\text{number of entries where }y=\text{label})+2}$ 
+
+
 
 # Techniques
 
