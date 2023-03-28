@@ -12,6 +12,7 @@ This is a cheatsheet for me to understanding machine-learning techniques and met
     - [Gaussian Discriminant Analysis](#gaussian-discriminant-analysis)
     - [Support Vector Machines (SVMs)](#support-vector-machines)
     - [Naive Bayes](#naive-bayes)
+    - [K-Means Clustering](#k-means-clustering)
 - [Techniques](#techniques)
     - [Cross Validation](#cross-validation)
     - [Regularization](#regularization)
@@ -398,6 +399,16 @@ $\Phi_y=$ fraction of entries where $y=1$
 - If training set is missing data and both $p(x|y=0)=0, p(x|y=1)=0$, apply Laplance smoothing  
 $\Phi_{j|y=\text{label}}=\frac{(\text{number of entries where }x_j=1\text{ and }y=\text{label})+1}{(\text{number of entries where }y=\text{label})+2}$ 
 
+---
+
+## K-Means Clustering
+
+- Unsupervised, no $y$ labels
+- $k$ centroids: $\mu_1,\mu_2,\dots,\mu_k\in\mathbb{R}^{n}$
+- Repeat until convergence:
+    - Assign nearest centroid for every x: $\forall i, c^{(i)}=\displaystyle\argmin_j||x^{(i)}-\mu_j||^2$
+    - Move each centroid to the mean of assigned points: $\forall j, \mu_i=\frac{\displaystyle\sum_{i=1}^{m}1(c^{(i)}=j)x^{(i)}}{\displaystyle\sum_{i=1}^{m}1(c^{(i)}=j)}$
+- Usually converges but could oscillate, could have mutliple random runs of initial $\mu_j$ 
 
 
 # Techniques
