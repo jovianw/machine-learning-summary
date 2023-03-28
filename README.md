@@ -415,7 +415,41 @@ $\Phi_{j|y=\text{label}}=\frac{(\text{number of entries where }x_j=1\text{ and }
 
 ## Cross Validation
 
-- 
+- Hold out validation:  
+&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2591;&#x2591;
+    - Split data into 2 groups. Measure performance with test set.
+    - For small datasets this may be inefficient use of data.
+    - Computationally efficient
+- K-fold cross validation:  
+&#x2591;&#x2591;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;  
+&#x2593;&#x2593;&#x2591;&#x2591;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;  
+&#x2593;&#x2593;&#x2593;&#x2593;&#x2591;&#x2591;&#x2593;&#x2593;&#x2593;&#x2593;  
+&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2591;&#x2591;&#x2593;&#x2593;  
+&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2591;&#x2591;
+    - Use $k-1$ folds to train, use remaining folds to test. Iterate through each configuration. Model performance is usually the mean of each configuration performance.
+    - More reliable than hold ou but $k$-times more expensive.
+- Leave-one-out cross validation (LOOCV):  
+&#x2591;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;  
+&#x2593;&#x2591;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;  
+&#x2593;&#x2593;&#x2591;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;  
+$\quad\vdots$  
+&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2591; 
+    - k-fold where $k=m$, from m samples
+    - Commonly used when m is small
+- 3-way hold out cross validation:  
+&#x2591;&#x2591;&#x2592;&#x2592;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;&#x2593;
+    - For model selection
+    - Include a validation set.
+    - Select hyperparameters/$\theta$ with validation set, then test with test set.
+    - Can do nested cross validation, where you use k-fold to select test set and a nested k-fold to select hyperparameters/$\theta$
+
+| | Large Dataset | Small Dataset |
+|-|-|-|
+| Estimating Performance | 2-way hold out | k-fold, LOOCV |
+| Model Selection, Hyperparameter Optimization & Performance Estimation | 3-way hold out | LOOCV with an independent test set |
+| Model Comparison | Disjoint training sets and test sets | Nested Cross validation |
+
+---
 
 ## Regularization
 
