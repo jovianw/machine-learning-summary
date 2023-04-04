@@ -1,6 +1,6 @@
-# Machine Learning Summary
+# Summary of the Fundamentals of Machine Learning
 
-This is a cheatsheet for me to understanding machine-learning techniques and methods, and it might help someone else out there too.
+This is a cheatsheet for machine-learning fundamentals.
 
 ## Contents
 - [Introduction](#machine-learning-summary)
@@ -36,6 +36,8 @@ This is a cheatsheet for me to understanding machine-learning techniques and met
 - $\lambda$: regularization parameter
 - $\Phi$: bernoulli distribution probability
 - $\Sigma$: Sum or covariance matrix
+- $l$: hidden layer
+- $a^{[l]}$: input to hidden layer
 
 # Models
 
