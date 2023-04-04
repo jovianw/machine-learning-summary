@@ -1,7 +1,5 @@
 # Summary of the Fundamentals of Machine Learning
 
-This is a cheatsheet for machine-learning fundamentals.
-
 ## Contents
 - [Introduction](#machine-learning-summary)
     - [Variable Definitions](#variable-definitions)
