@@ -13,8 +13,11 @@ This is a cheatsheet for me to understanding machine-learning techniques and met
     - [Support Vector Machines (SVMs)](#support-vector-machines)
     - [Naive Bayes](#naive-bayes)
     - [K-Means Clustering](#k-means-clustering)
+    - [Simple Neural Networks](#simple-neural-networks)
 - [Techniques](#techniques)
     - [Cross Validation](#cross-validation)
+    - [Feature Selection](#feature-selection)
+    - [Principal Components Analysis](#principal-components-analysis-pca)
     - [Regularization](#regularization)
 
 ## Variable Definitions
@@ -406,9 +409,44 @@ $\Phi_{j|y=\text{label}}=\frac{(\text{number of entries where }x_j=1\text{ and }
 - Unsupervised, no $y$ labels
 - $k$ centroids: $\mu_1,\mu_2,\dots,\mu_k\in\mathbb{R}^{n}$
 - Repeat until convergence:
-    - Assign nearest centroid for every x: $\forall i, c^{(i)}=\displaystyle\argmin_j||x^{(i)}-\mu_j||^2$
+    - Assign nearest centroid for every x: $\forall i, c^{(i)}=\displaystyle\mathop{\operatorname{arg\,min}}\limits_j||x^{(i)}-\mu_j||^2$
     - Move each centroid to the mean of assigned points: $\forall j, \mu_i=\frac{\displaystyle\sum_{i=1}^{m}1(c^{(i)}=j)x^{(i)}}{\displaystyle\sum_{i=1}^{m}1(c^{(i)}=j)}$
 - Usually converges but could oscillate, could have mutliple random runs of initial $\mu_j$ 
+
+---
+
+## Simple Neural Networks
+
+- Input features &rarr; Inputs layer &rarr; Hidden layer &rarr; Output layer &rarr; Output y
+- Each input i to a hidden layer l is denoted activation $a_i^{[l]}$
+- Each hidden unit includes inputs, some function $z=w^Tx+b$, some activation function $g(z)$, and output $a_i^{[l]}$
+- Example activation functions:
+    - Sigmoid/logistic: $\frac{1}{1+e^{-z}}$
+    - ReLU: $\max(z, 0)$
+    - tanh: $\frac{e^z-e^{-z}}{e^z+e^{-z}}$
+    - Usually non-linear
+- Vectorization
+    - Can get $w^T$ from $W_i^{[l]T}$ where $W_i^{[l]T}$ is the ith row of the overall matrix of parameters for layer l, $W^{[l]}$
+    - Similar process for z and x
+    - $Z^{[l]}=W^{[l]}X+b^{[l]}$
+- Initialize W and b to small random numbers (commonly $N(0, 0.1)$). Do not set to zero, otherwise output will always be 0.
+- Backpropogation:
+    - Consider a run of a nn using sigmoid activation function
+    - Loss $L=-((1-y)\log(1-\hat y) + y\log \hat y)$
+    - $W^{[l]}=W^{[l]}-\alpha \frac{dL}{dW^{[l]}}$
+    - $b^{[l]}=b^{[l]}-\alpha \frac{dL}{db^{[l]}}$
+    - After a lot of math, $\frac{dL}{dW^{[3]}}=(a^{[3]}-y)a^{[2]T}$
+    - Chain rule:
+        - $L$ depends on $a^{[3]}$
+        - $a^{[3]}$ depends on $z^{[3]}$
+        - $z^{[3]}$ is related to $a^{[2]}$
+        - $a^{[2]}$ depends on $z^{[2]}$
+        - $z^{[2]}$ depends on $W^{[2]}$
+        - Therefore, $\frac{dL}{dW^{[2]}} = \frac{dL}{da^{[3]}} \cdot \frac{da^{[3]}}{dz^{[3]}} \cdot \frac{dz^{[3]}}{da^{[2]}} \cdot \frac{da^{[2]}}{dz^{[2]}} \cdot \frac{dz^{[2]}}{dW^{[2]}}$
+    - After more math, $\frac{dL}{dW^{[2]}} = (a^{[3]}-y)W^{[3]}g'(z^{[2]})a^{[1]T}$
+    - Essentially, $W^{[3]}$ and $a^{[3]}$ propogate backward to make changes to $W^{[2]}$
+- Can use full gradient descent, mini-batch gradient descent, or momentum
+- L2 regularize with descent step $W=(1-\alpha \lambda)W - \alpha \frac{dJ}{dW}$
 
 
 # Techniques
@@ -449,6 +487,58 @@ $\quad\vdots$
 | Model Selection, Hyperparameter Optimization & Performance Estimation | 3-way hold out | LOOCV with an independent test set |
 | Model Comparison | Disjoint training sets and test sets | Nested Cross validation |
 
+---
+
+## Feature Selection
+
+- In the case where n >> m and some features in n might not be relevant
+- Wrapper Methods: Wrap your algorithm in another algorithm with subsets of features. Algorithm dependent. More computationally intensive.
+    - Forward Search:  
+        - Sequential variation:  
+        Start with an empty feature set $f=\emptyset$  
+        Repeat for $i=1,2,\dots,n$  
+            > Let $f_i=f\cup\{i\}$  
+            Train algorithm using features $x_j, j\in f_i$  
+            Meaure generalization error for $f_i$  
+            $f=f_i$  
+        - Choose $f$ as the lowest generalization across all $i$ variations
+        - Performs best when optimal $f$ is small
+        - Sequential forward search is unable to remove specific features that are less useful/obsolete
+    - Backward Search:
+        - Sequential variation:  
+        Start with all features $f=\{1,2,\dots,n\}$  
+        Repeat for $i=n,n-1,\dots,1$  
+            > Let $f_i=f$  
+            Train algorithm using features $x_j, j\in f_i$  
+            Meaure generalization error for $f_i$  
+            $f=f_i \setminus i$  
+        - Performs best when optimal $f$ is large
+        - Sequential backward search cannot reinstant useful features once they are out
+- Filter Methods: Compute score on each feature that measures how informative it is. Algorithm independent. Less computationally intensive.
+    - Define some score $S(j)$ that measures how informative column $j$ is, then pick the $k$ features with the larges score.
+    - Scoring functions:
+        - Absolute value of the correlation between $x_j$ and $y$
+        - Mutual information between $x_j$ and $y$  
+        $MI(x_j,y)=\displaystyle\sum_{x_j\in\{0,1\}}\displaystyle\sum_{y\in\{0,1\}}p(x_j,y)\log\frac{p(x_j,y)}{p(x_j)p(y)}$
+    - Can choose $k$ using cross-validation
+- Other methods:
+    - Remove features with low variance
+    - Tree-based estimators
+
+---
+
+## Principal Components Analysis (PCA)
+
+- Given a dataset where $x^{(i)}\in\mathbb{R}^n$, find a subspace $\mathbb{R}^k$, k << n, in which $x$ approximately lies
+- Remove redundant features, project data into a difference subspace
+- Preprocessing: Normalize the dataset
+- Find direction of maximum variance  
+    - Consider a new unit vector $\bar u$ where $||u||=1$. $proj_{\bar u}(x^{(i)})=x^{(i)T} \bar u$
+    - Maximize $\frac{1}{m}\displaystyle\sum_{i=1}^{m}(x^{(i)T} \bar u)^2$ $\rightarrow$ $\max \bar u ^{T}\Sigma u $ such that $\bar u^T \bar u=1$
+        - This has n solutions for eignvalues $\lambda _1, \lambda _2, \dots, \lambda _n$
+        - The principal eigenvector is $u_1$ where $\Sigma u_1 = \lambda _1 u_1$
+    - $u_1$ and $u_2$ are orthogonal
+        
 ---
 
 ## Regularization
