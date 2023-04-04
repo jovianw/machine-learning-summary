@@ -37,15 +37,6 @@ This is a cheatsheet for me to understanding machine-learning techniques and met
 - $\Phi$: bernoulli distribution probability
 - $\Sigma$: Sum or covariance matrix
 
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-import scipy as sc
-import random
-import sklearn.datasets 
-import time
-```
-
 # Models
 
 ## Simple Regression
